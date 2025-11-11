@@ -1,0 +1,17 @@
+PS C:\Users\Bikash\Desktop\Keylogger\Keylogger_CSCI642> python generate_data.py
+Testing Keylogger Data Collection System...
+[INFO] Starting data collection for 60 seconds...
+[INFO] Press Ctrl+C to stop early
+[DETECTED] Potential keylogger: PID 25484, Name: python.exe
+[COLLECTED] Scan 1: 311 processes, 1 keyloggers detected
+[INFO] Data collection completed. Total scans: 1
+[INFO] Data saved to: test_behavioral_data.csv
+
+[DATA ANALYSIS]
+Total records: 931
+Total processes monitored: 202
+Keylogger samples: 28
+Benign samples: 903
+
+Keylogger process statistics:
+[ERROR] Analysis failed: "['cpu_percent'] not in index"
