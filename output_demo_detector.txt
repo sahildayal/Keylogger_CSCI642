@@ -1,0 +1,66 @@
+PS C:\Users\Bikash\Desktop\Keylogger\Keylogger_CSCI642> python demo_detector.py
+=== KEYLOGGER DETECTION THROUGH BEHAVIORAL ANALYSIS ===
+Behavioral Analysis & System Monitoring Demo
+
+
+ KEYLOGGER DETECTION DEMO - SECURE CODING PROJECT
+Monitoring for 30 seconds...
+==================================================
+This demo detects Python processes as simulated keyloggers
+==================================================
+
+🔍 Scan 1 - 15:21:54
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.2 MB
+   Reason: Python processes often used for keyloggers
+
+🔍 Scan 2 - 15:21:59
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.7 MB
+   Reason: Python processes often used for keyloggers
+
+🔍 Scan 3 - 15:22:05
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.1 MB
+   Reason: Python processes often used for keyloggers
+
+🔍 Scan 4 - 15:22:10
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.6 MB
+   Reason: Python processes often used for keyloggers
+
+🔍 Scan 5 - 15:22:16
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.6 MB
+   Reason: Python processes often used for keyloggers
+
+🔍 Scan 6 - 15:22:21
+------------------------------
+🚨 KEYLOGGER DETECTED: python.exe (PID: 2264)
+   Confidence: 85% (Python process behavior)
+   CPU Usage: 0.0%
+   Memory Usage: 17.6 MB
+   Reason: Python processes often used for keyloggers
+
+==================================================
+DEMO COMPLETED
+
+Demo Summary:
+   - Successfully detected Python processes as potential keyloggers
+   - Demonstrated behavioral analysis in real-time
+   - Showcased system monitoring capabilities
