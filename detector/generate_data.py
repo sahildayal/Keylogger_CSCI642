@@ -1,7 +1,9 @@
 import os
+from matplotlib import pyplot as plt
 import psutil
 import time
 import pandas as pd
+import seaborn as sns
 
 # TODO : populate this list with actual keylogger PIDs
 keylogger_pid_list = []
@@ -35,6 +37,7 @@ def get_process_memory_usage():
         
         # you have to call cpu_percent two times to get a valid reading
         proc.cpu_percent()
+        time.sleep(0.1)
         proc_dict["cpu_percent"] = proc.cpu_percent()
 
         # Assign labels based on PID
@@ -50,18 +53,58 @@ def get_process_memory_usage():
 
     print("time taken to get memory usage of all processes: ", time.time() - start)
 
-def print_data():
-    df = pd.read_csv("process_memory_usage.csv")
+def print_data(file):
+    df = pd.read_csv(file)
     print()
     print(df.head())
     print(df.info())
     print(df.describe())
-    # print(df.avg_cpu_percent.describe())
-    max_row = df[df['cpu_percent'] == df['cpu_percent'].max()]
-    # max_row = df[df['avg_cpu_percent'] == df['avg_cpu_percent'].max()]
-    print(max_row)
-    print("Max CPU Percent: ", df['cpu_percent'].max())
-    
+    print(df[df['nice'] == pd.NA])
 
-get_process_memory_usage()
-# print_data()
+def extract_keylogger_data():
+    key_df  = pd.DataFrame()
+    benign_df  = pd.DataFrame()
+    with os.scandir("data") as es:
+        for e in es:
+            if e.is_file() and e.name.endswith('.csv'):
+                df = pd.read_csv(e.path)
+
+                # get keylogger data
+                keylogger_data = df[df['label'] == 'keylogger']
+                if key_df.empty:
+                    key_df = keylogger_data
+                else:
+                    key_df = pd.concat([key_df, keylogger_data], ignore_index=True)
+
+                # get benign data
+                benign_data = df[df['label'] == 'keylogger']
+                if benign_df.empty:
+                    benign_df = benign_data
+                else:
+                    benign_df = pd.concat([benign_df, benign_data], ignore_index=True)
+    key_df.to_csv('benign_data.csv', index=False)
+    benign_df.to_csv('benign_data.csv', index=False)
+
+def generate_boxplots():
+    df = pd.read_csv("keylogger_data.csv")
+    df2 = pd.read_csv("benign_data.csv")
+    df = df.drop(columns=['exe', 'cmdline', 'pid', 'name', 'open_files'])
+    df2 = df2.drop(columns=['exe', 'cmdline', 'pid', 'name', 'open_files'])
+    print(len(df.select_dtypes(include=['float64', 'int64']).columns))
+
+    plt.figure(figsize=(10, 6))
+
+    for i, column in enumerate(df.select_dtypes(include=['float64', 'int64']).columns):  
+        # sns.histplot(df[column], kde=True)
+        print(column, i,i//3, i%3)
+        plt.title(f'Distribution of {column}')
+        # sns.histplot(df[column], color='red', label='keylogger', fill=True, alpha=0.5, ax=axes[i//3][i%3])
+        # sns.histplot(df2[column], color='blue', label='benign', fill=True, alpha=0.5, ax=axes[i//3][i%3])
+        plt.boxplot([df[column], df2[column]], labels=['keylogger', 'benign'], showfliers=False)
+        print()
+        plt.savefig("graphs/"+column+"_boxplot.png")
+        plt.clf()
+    
+# get_process_memory_usage()
+# generate_boxplots()
+# extract_keylogger_data()
