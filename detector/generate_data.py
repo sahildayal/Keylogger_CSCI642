@@ -11,47 +11,80 @@ keylogger_pid_list = []
 def get_process_memory_usage():
     lst = []
     start = time.time()
+    processed_count = 0
+    error_count = 0
 
     for proc in psutil.process_iter(["pid", "name", "exe", "cpu_times", "memory_info", "memory_percent",
                                      "num_ctx_switches", "num_handles", "num_threads", "io_counters", "cmdline",
                                      "nice", "open_files", "cpu_percent"]):
-        if proc.info['pid'] == 0:
-            continue  # skip System Idle Process on Windows
-        proc_dict = proc.info.copy()
+        try:
+            if proc.info['pid'] == 0:
+                continue  
+            
+            proc_dict = proc.info.copy()
 
-        # Flatten nested structures
-        proc_dict["read_count"] = proc_dict["io_counters"].read_count
-        proc_dict["write_count"] = proc_dict["io_counters"].write_count
-        proc_dict["read_bytes"] = proc_dict["io_counters"].read_bytes
-        proc_dict["write_bytes"] = proc_dict["io_counters"].write_bytes
-        del proc_dict["io_counters"]
-        proc_dict["cpu_times_user"] = proc_dict["cpu_times"].user
-        proc_dict["cpu_times_system"] = proc_dict["cpu_times"].system
-        del proc_dict["cpu_times"]
-        proc_dict["voluntary_ctx_switches"] = proc_dict["num_ctx_switches"].voluntary
-        proc_dict["involuntary_ctx_switches"] = proc_dict["num_ctx_switches"].involuntary
-        del proc_dict["num_ctx_switches"]
-        proc_dict["memory_rss"] = proc_dict["memory_info"].rss / (1024 ** 2)  # in MB
-        proc_dict["memory_vms"] = proc_dict["memory_info"].vms / (1024 ** 2)  # in MB
-        del proc_dict["memory_info"]
-        
-        # you have to call cpu_percent two times to get a valid reading
-        proc.cpu_percent()
-        time.sleep(0.1)
-        proc_dict["cpu_percent"] = proc.cpu_percent()
+            try:
+                proc_dict["read_count"] = proc_dict["io_counters"].read_count
+                proc_dict["write_count"] = proc_dict["io_counters"].write_count
+                proc_dict["read_bytes"] = proc_dict["io_counters"].read_bytes
+                proc_dict["write_bytes"] = proc_dict["io_counters"].write_bytes
+            except (AttributeError, psutil.NoSuchProcess):
+                proc_dict["read_count"] = 0
+                proc_dict["write_count"] = 0
+                proc_dict["read_bytes"] = 0
+                proc_dict["write_bytes"] = 0
+            del proc_dict["io_counters"]
 
-        # Assign labels based on PID
-        if proc_dict['pid'] in keylogger_pid_list:
-            proc_dict["label"] = "keylogger"
-        else:
-            proc_dict["label"] = "benign"
+            try:
+                proc_dict["cpu_times_user"] = proc_dict["cpu_times"].user
+                proc_dict["cpu_times_system"] = proc_dict["cpu_times"].system
+            except (AttributeError, psutil.NoSuchProcess):
+                proc_dict["cpu_times_user"] = 0
+                proc_dict["cpu_times_system"] = 0
+            del proc_dict["cpu_times"]
 
-        lst.append(proc_dict)
+            try:
+                proc_dict["voluntary_ctx_switches"] = proc_dict["num_ctx_switches"].voluntary
+                proc_dict["involuntary_ctx_switches"] = proc_dict["num_ctx_switches"].involuntary
+            except (AttributeError, psutil.NoSuchProcess):
+                proc_dict["voluntary_ctx_switches"] = 0
+                proc_dict["involuntary_ctx_switches"] = 0
+            del proc_dict["num_ctx_switches"]
+
+            try:
+                proc_dict["memory_rss"] = proc_dict["memory_info"].rss / (1024 ** 2)  # in MB
+                proc_dict["memory_vms"] = proc_dict["memory_info"].vms / (1024 ** 2)  # in MB
+            except (AttributeError, psutil.NoSuchProcess):
+                proc_dict["memory_rss"] = 0
+                proc_dict["memory_vms"] = 0
+            del proc_dict["memory_info"]
+            
+            try:
+                proc.cpu_percent()
+                time.sleep(0.5)  
+                proc_dict["cpu_percent"] = proc.cpu_percent()
+            except psutil.NoSuchProcess:
+                proc_dict["cpu_percent"] = 0
+
+            
+            if proc_dict['pid'] in keylogger_pid_list:
+                proc_dict["label"] = "keylogger"
+            else:
+                proc_dict["label"] = "benign"
+
+            lst.append(proc_dict)
+            processed_count += 1
+            
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            error_count += 1
+            continue
 
     df = pd.DataFrame(lst)
     df.to_csv("process_memory_usage.csv", index=False)
 
-    print("time taken to get memory usage of all processes: ", time.time() - start)
+    print(f"Successfully processed {processed_count} processes, {error_count} errors")
+    print("Time taken to get memory usage of all processes: ", time.time() - start)
+    return df
 
 def print_data(file):
     df = pd.read_csv(file)
@@ -104,7 +137,49 @@ def generate_boxplots():
         print()
         plt.savefig("graphs/"+column+"_boxplot.png")
         plt.clf()
+
+def standardize_features(df):
+    """Ensure consistent feature order and types across all data"""
+    expected_features = [
+        'cpu_percent', 'memory_percent', 'num_handles', 'num_threads', 'nice',
+        'read_count', 'write_count', 'read_bytes', 'write_bytes', 
+        'cpu_times_user', 'cpu_times_system', 'voluntary_ctx_switches',
+        'involuntary_ctx_switches', 'memory_rss', 'memory_vms'
+    ]
+    
+    # Create missing columns with default values
+    for feature in expected_features:
+        if feature not in df.columns:
+            df[feature] = 0
+    
+    # Select and reorder columns
+    return df[expected_features]
+
+def continuous_data_collection(duration_minutes=60):
+    """Run data collection continuously"""
+    from datetime import datetime
+    all_data = []
+    start_time = time.time()
+    
+    print(f"Starting continuous data collection for {duration_minutes} minutes...")
+    
+    while time.time() - start_time < duration_minutes * 60:
+        print(f"Collection cycle at {datetime.now().strftime('%H:%M:%S')}")
+        current_data = get_process_memory_usage()
+        all_data.append(current_data)
+        print(f"Collected {len(current_data)} process samples")
+        time.sleep(30)  
+    
+    # Combine and save all data
+    if all_data:
+        final_df = pd.concat(all_data, ignore_index=True)
+        filename = f"continuous_data_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+        final_df.to_csv(filename, index=False)
+        print(f"Continuous collection complete! Saved to {filename}")
+    
+    return all_data
     
 # get_process_memory_usage()
 # generate_boxplots()
 # extract_keylogger_data()
+continuous_data_collection(duration_minutes=5)
