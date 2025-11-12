@@ -6,6 +6,9 @@ from datetime import datetime
 def collect_clean_data():
     """Collects clean, properly labeled data for training"""
     print("[INFO] Collecting clean training data...")
+
+    # list of known keylogger PIDs
+    keylogger_pid = []
     
     # Initialize data structure
     data = []
@@ -35,7 +38,10 @@ def collect_clean_data():
                 cpu_percent = proc.cpu_percent()
                 
                 # Label keyloggers (Python processes for demo)
-                is_keylogger = 1 if 'python' in proc_info['name'].lower() else 0
+                # is_keylogger = 1 if 'python' in proc_info['name'].lower() else 0
+
+                # hardcode so we make sure the keylogger is real
+                is_keylogger = 1 if pid in keylogger_pid else 0
                 
                 # Collect metrics
                 process_data = {
