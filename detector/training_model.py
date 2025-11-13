@@ -8,7 +8,6 @@ import joblib
 def retrain_with_continuous_data():
     print("RETRAINING MODEL WITH CONTINUOUS DATA")
     
-    # Load your new continuous data
     labeled_df = pd.read_csv('labeled_continuous_data.csv')
     print(f"Loaded labeled continuous data: {len(labeled_df)} samples")
 
