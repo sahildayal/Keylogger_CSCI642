@@ -17,59 +17,72 @@ def get_process_memory_usage():
                                      "num_ctx_switches", "num_handles", "num_threads", "io_counters", "cmdline",
                                      "nice", "open_files", "cpu_percent"]):
         try:
-            if proc.info['pid'] == 0:
-                continue  
+            if proc.info['pid'] == 0 or proc.info['pid'] == 4:  # Skip System processes
+                continue
             
-            proc_dict = proc.info.copy()
-
+            proc_dict = {}
+            
+            # Store basic info
+            proc_dict["pid"] = proc.info['pid']
+            proc_dict["name"] = proc.info['name']
+            proc_dict["exe"] = proc.info.get('exe', '')
+            proc_dict["cmdline"] = ' '.join(proc.info.get('cmdline', [])) if proc.info.get('cmdline') else ''
+            proc_dict["open_files"] = len(proc.info.get('open_files', [])) if proc.info.get('open_files') is not None else 0
+            
+            # CPU and Memory features (CRITICAL - model needs these)
             try:
-                proc_dict["read_count"] = proc_dict["io_counters"].read_count
-                proc_dict["write_count"] = proc_dict["io_counters"].write_count
-                proc_dict["read_bytes"] = proc_dict["io_counters"].read_bytes
-                proc_dict["write_bytes"] = proc_dict["io_counters"].write_bytes
-            except (AttributeError, psutil.NoSuchProcess):
+                proc.cpu_percent()  # Initialize
+                time.sleep(0.1)
+                proc_dict["cpu_percent"] = proc.cpu_percent()
+            except:
+                proc_dict["cpu_percent"] = 0
+                
+            proc_dict["memory_percent"] = proc.info.get('memory_percent', 0)
+            
+            # Memory info
+            try:
+                memory_info = proc.info['memory_info']
+                proc_dict["memory_rss"] = memory_info.rss / (1024 ** 2) if memory_info else 0
+                proc_dict["memory_vms"] = memory_info.vms / (1024 ** 2) if memory_info else 0
+            except:
+                proc_dict["memory_rss"] = 0
+                proc_dict["memory_vms"] = 0
+            
+            # Process characteristics
+            proc_dict["num_handles"] = proc.info.get('num_handles', 0)
+            proc_dict["num_threads"] = proc.info.get('num_threads', 0)
+            proc_dict["nice"] = proc.info.get('nice', 0)
+            
+            # I/O counters
+            try:
+                io = proc.info['io_counters']
+                proc_dict["read_count"] = io.read_count if io else 0
+                proc_dict["write_count"] = io.write_count if io else 0
+                proc_dict["read_bytes"] = io.read_bytes if io else 0
+                proc_dict["write_bytes"] = io.write_bytes if io else 0
+            except:
                 proc_dict["read_count"] = 0
                 proc_dict["write_count"] = 0
                 proc_dict["read_bytes"] = 0
                 proc_dict["write_bytes"] = 0
-            del proc_dict["io_counters"]
-
+            
+            # CPU times
             try:
-                proc_dict["cpu_times_user"] = proc_dict["cpu_times"].user
-                proc_dict["cpu_times_system"] = proc_dict["cpu_times"].system
-            except (AttributeError, psutil.NoSuchProcess):
+                cpu_times = proc.info['cpu_times']
+                proc_dict["cpu_times_user"] = cpu_times.user if cpu_times else 0
+                proc_dict["cpu_times_system"] = cpu_times.system if cpu_times else 0
+            except:
                 proc_dict["cpu_times_user"] = 0
                 proc_dict["cpu_times_system"] = 0
-            del proc_dict["cpu_times"]
-
+            
+            # Context switches
             try:
-                proc_dict["voluntary_ctx_switches"] = proc_dict["num_ctx_switches"].voluntary
-                proc_dict["involuntary_ctx_switches"] = proc_dict["num_ctx_switches"].involuntary
-            except (AttributeError, psutil.NoSuchProcess):
+                ctx_switches = proc.info['num_ctx_switches']
+                proc_dict["voluntary_ctx_switches"] = ctx_switches.voluntary if ctx_switches else 0
+                proc_dict["involuntary_ctx_switches"] = ctx_switches.involuntary if ctx_switches else 0
+            except:
                 proc_dict["voluntary_ctx_switches"] = 0
                 proc_dict["involuntary_ctx_switches"] = 0
-            del proc_dict["num_ctx_switches"]
-
-            try:
-                proc_dict["memory_rss"] = proc_dict["memory_info"].rss / (1024 ** 2)  # in MB
-                proc_dict["memory_vms"] = proc_dict["memory_info"].vms / (1024 ** 2)  # in MB
-            except (AttributeError, psutil.NoSuchProcess):
-                proc_dict["memory_rss"] = 0
-                proc_dict["memory_vms"] = 0
-            del proc_dict["memory_info"]
-            
-            try:
-                proc.cpu_percent()
-                time.sleep(0.5)  
-                proc_dict["cpu_percent"] = proc.cpu_percent()
-            except psutil.NoSuchProcess:
-                proc_dict["cpu_percent"] = 0
-
-            
-            if proc_dict['pid'] in keylogger_pid_list:
-                proc_dict["label"] = "keylogger"
-            else:
-                proc_dict["label"] = "benign"
 
             lst.append(proc_dict)
             processed_count += 1
@@ -79,8 +92,6 @@ def get_process_memory_usage():
             continue
 
     df = pd.DataFrame(lst)
-    df.to_csv("process_memory_usage.csv", index=False)
-
     print(f"Successfully processed {processed_count} processes, {error_count} errors")
     print("Time taken to get memory usage of all processes: ", time.time() - start)
     return df
@@ -112,7 +123,7 @@ def standardize_features(df):
         return df[expected_features]
     except:
         return df
-
+    
 def ml_detector_with_confidence(proc_data):
     loaded_rf = joblib.load("./retrained_detector.pkl")
     proc_data_clean = standardize_features(proc_data)
