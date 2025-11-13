@@ -13,12 +13,11 @@ FEATURE_COLUMNS = [
 ]
 
 
-def train_detector(csv_path="behavior_dataset.csv", model_path="retrained_detector.pkl"):
-    print(f"[INFO] Loading dataset: {csv_path}")
-    df = pd.read_csv(csv_path)
+def train_detector(csv_path="labeled_behavior_data.csv",
+                   model_path="retrained_detector.pkl"):
 
-    # Keep only usable labels
-    df = df[df['label'].isin(['benign', 'keylogger'])].copy()
+    df = pd.read_csv(csv_path)
+    df = df[df['label'].isin(['benign','keylogger'])]
 
     X = df[FEATURE_COLUMNS].fillna(0)
     y = df['label']
@@ -27,33 +26,27 @@ def train_detector(csv_path="behavior_dataset.csv", model_path="retrained_detect
     print(y.value_counts())
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42, stratify=y
+        X, y, test_size=0.25, random_state=42, stratify=y
     )
 
     model = RandomForestClassifier(
         n_estimators=200,
-        max_depth=14,
+        max_depth=16,
         class_weight='balanced',
         random_state=42
     )
+
     model.fit(X_train, y_train)
 
     preds = model.predict(X_test)
 
-    print("\n[INFO] Accuracy:", accuracy_score(y_test, preds))
+    print("[INFO] Accuracy:", accuracy_score(y_test, preds))
     print("\n[INFO] Classification Report:\n", classification_report(y_test, preds))
 
-    print("\n[INFO] Feature Importances:")
-    for f, imp in zip(FEATURE_COLUMNS, model.feature_importances_):
-        print(f"{f:25s}: {imp:.4f}")
-
-    bundle = {
-        "model": model,
-        "features": FEATURE_COLUMNS
-    }
+    bundle = {"model": model, "features": FEATURE_COLUMNS}
     joblib.dump(bundle, model_path)
 
-    print(f"[INFO] Saved model → {model_path}")
+    print(f"[INFO] Saved detector → {model_path}")
 
 
 if __name__ == "__main__":

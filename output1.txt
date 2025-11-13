@@ -1,0 +1,242 @@
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI64> python -c "from generate_data import collect_dataset; collect_dataset(label='benign', duration_seconds=90, interval_seconds=5, output_file='behavior_dataset.csv')"
+[INFO] Collecting benign data for 90s...
+[INFO] Snapshot at 16:27:02 with 171 processes
+[INFO] Snapshot at 16:27:07 with 171 processes
+[INFO] Snapshot at 16:27:13 with 171 processes
+[INFO] Snapshot at 16:27:19 with 170 processes
+[INFO] Snapshot at 16:27:25 with 170 processes
+[INFO] Snapshot at 16:27:30 with 170 processes
+[INFO] Snapshot at 16:27:36 with 170 processes
+[INFO] Snapshot at 16:27:42 with 169 processes
+[INFO] Snapshot at 16:27:48 with 169 processes
+[INFO] Snapshot at 16:27:53 with 169 processes
+[INFO] Snapshot at 16:27:59 with 169 processes
+[INFO] Snapshot at 16:28:05 with 169 processes
+[INFO] Snapshot at 16:28:11 with 169 processes
+[INFO] Snapshot at 16:28:16 with 169 processes
+[INFO] Snapshot at 16:28:22 with 169 processes
+[INFO] Snapshot at 16:28:28 with 169 processes
+[INFO] Saved 2714 rows to behavior_dataset.csv
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python stealth_keylogger.py
+Testing Stealth Keylogger...
+1. Basic stealth
+2. Medium stealth
+3. Advanced stealth
+Select stealth level (1-3): 3
+[INFO] Stealth Keylogger initialized (Level 3)
+[INFO] Log file: C:\Users\sdvir\AppData\Local\Temp\system_logs_1906.csv
+[INFO] Stealth Keylogger started (Level 3)
+[INFO] Logging to: C:\Users\sdvir\AppData\Local\Temp\system_logs_1906.csv
+[INFO] Press ESC to stop.
+[INFO] Stealth Keylogger stopped.
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python
+Python 3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import pandas as pd
+... df = pd.read_csv("behavior_dataset.csv")
+... df['label'].value_counts()
+... exit()
+...
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python
+Python 3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import pandas as pd
+>>> df = pd.read_csv("behavior_dataset.csv")
+>>> df['label'].value_counts()
+label
+keylogger    2793
+benign       2714
+Name: count, dtype: int64
+>>> exit()
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python training_model.py
+[INFO] Loading dataset: behavior_dataset.csv
+[INFO] Label distribution:
+label
+keylogger    2793
+benign       2714
+Name: count, dtype: int64
+
+[INFO] Accuracy: 0.9830611010284331
+
+[INFO] Classification Report:
+               precision    recall  f1-score   support
+
+      benign       0.98      0.98      0.98       815
+   keylogger       0.98      0.98      0.98       838
+
+    accuracy                           0.98      1653
+   macro avg       0.98      0.98      0.98      1653
+weighted avg       0.98      0.98      0.98      1653
+
+
+[INFO] Feature Importances:
+cpu_percent              : 0.0032
+memory_percent           : 0.1248
+num_handles              : 0.0728
+num_threads              : 0.0532
+nice                     : 0.0119
+read_count               : 0.0628
+write_count              : 0.0582
+read_bytes               : 0.0612
+write_bytes              : 0.0482
+cpu_times_user           : 0.0679
+cpu_times_system         : 0.0788
+voluntary_ctx_switches   : 0.1390
+involuntary_ctx_switches : 0.0000
+memory_rss               : 0.1305
+memory_vms               : 0.0876
+[INFO] Saved model → retrained_detector.pkl
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642>
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python detector.py
+
+
+[RESULTS]
+[ALERT] Keylogger detected → System Idle Process (PID 0) | 0.89
+[WARN ] Suspicious process → System (PID 4) | 0.71
+[ALERT] Keylogger detected → Registry (PID 124) | 0.89
+[WARN ] Suspicious process → smss.exe (PID 472) | 0.53
+[WARN ] Suspicious process → fontdrvhost.exe (PID 512) | 0.69
+[WARN ] Suspicious process → fontdrvhost.exe (PID 516) | 0.69
+[WARN ] Suspicious process → powershell.exe (PID 564) | 0.72
+[WARN ] Suspicious process → csrss.exe (PID 648) | 0.67
+[ALERT] Keylogger detected → wininit.exe (PID 720) | 0.81
+[WARN ] Suspicious process → csrss.exe (PID 728) | 0.70
+[WARN ] Suspicious process → winlogon.exe (PID 792) | 0.67
+[WARN ] Suspicious process → services.exe (PID 868) | 0.55
+[ALERT] Keylogger detected → lsass.exe (PID 888) | 0.87
+[WARN ] Suspicious process → svchost.exe (PID 964) | 0.63
+[WARN ] Suspicious process → svchost.exe (PID 968) | 0.62
+[WARN ] Suspicious process → msedgewebview2.exe (PID 976) | 0.74
+[WARN ] Suspicious process → svchost.exe (PID 1016) | 0.53
+[WARN ] Suspicious process → svchost.exe (PID 1032) | 0.66
+[ALERT] Keylogger detected → chrome.exe (PID 1096) | 0.99
+[ALERT] Keylogger detected → dwm.exe (PID 1132) | 0.87
+[WARN ] Suspicious process → svchost.exe (PID 1156) | 0.53
+[ALERT] Keylogger detected → svchost.exe (PID 1164) | 0.83
+[ALERT] Keylogger detected → chrome.exe (PID 1180) | 0.83
+[ALERT] Keylogger detected → Code.exe (PID 1216) | 0.93
+[ALERT] Keylogger detected → MemCompression (PID 1272) | 0.91
+[ALERT] Keylogger detected → Code.exe (PID 1296) | 0.81
+[WARN ] Suspicious process → svchost.exe (PID 1416) | 0.73
+[WARN ] Suspicious process → svchost.exe (PID 1428) | 0.56
+[WARN ] Suspicious process → svchost.exe (PID 1472) | 0.70
+[ALERT] Keylogger detected → msedge.exe (PID 1480) | 0.91
+[WARN ] Suspicious process → svchost.exe (PID 1520) | 0.56
+[WARN ] Suspicious process → svchost.exe (PID 1532) | 0.56
+[WARN ] Suspicious process → chrome.exe (PID 1580) | 0.65
+[WARN ] Suspicious process → svchost.exe (PID 1600) | 0.75
+[WARN ] Suspicious process → svchost.exe (PID 1624) | 0.50
+[WARN ] Suspicious process → svchost.exe (PID 1680) | 0.61
+[WARN ] Suspicious process → svchost.exe (PID 1756) | 0.54
+[ALERT] Keylogger detected → svchost.exe (PID 1776) | 0.85
+[WARN ] Suspicious process → svchost.exe (PID 1804) | 0.51
+[WARN ] Suspicious process → svchost.exe (PID 1812) | 0.64
+[WARN ] Suspicious process → svchost.exe (PID 1900) | 0.61
+[WARN ] Suspicious process → chrome.exe (PID 1968) | 0.63
+[WARN ] Suspicious process → svchost.exe (PID 2072) | 0.66
+[WARN ] Suspicious process → svchost.exe (PID 2104) | 0.66
+[WARN ] Suspicious process → svchost.exe (PID 2112) | 0.50
+[ALERT] Keylogger detected → svchost.exe (PID 2132) | 0.85
+[ALERT] Keylogger detected → conhost.exe (PID 2160) | 0.84
+[WARN ] Suspicious process → python.exe (PID 2280) | 0.51
+[WARN ] Suspicious process → svchost.exe (PID 2404) | 0.52
+[WARN ] Suspicious process → svchost.exe (PID 2504) | 0.53
+[ALERT] Keylogger detected → Code.exe (PID 2536) | 0.80
+[WARN ] Suspicious process → svchost.exe (PID 2572) | 0.65
+[WARN ] Suspicious process → svchost.exe (PID 2640) | 0.74
+[WARN ] Suspicious process → svchost.exe (PID 2696) | 0.52
+[WARN ] Suspicious process → svchost.exe (PID 2848) | 0.65
+[WARN ] Suspicious process → powershell.exe (PID 2924) | 0.73
+[WARN ] Suspicious process → spoolsv.exe (PID 2932) | 0.59
+[WARN ] Suspicious process → svchost.exe (PID 2976) | 0.56
+[ALERT] Keylogger detected → msedge.exe (PID 2984) | 0.85
+[WARN ] Suspicious process → svchost.exe (PID 2996) | 0.66
+[ALERT] Keylogger detected → Notepad.exe (PID 3076) | 0.88
+[WARN ] Suspicious process → svchost.exe (PID 3084) | 0.58
+[WARN ] Suspicious process → svchost.exe (PID 3096) | 0.68
+[WARN ] Suspicious process → svchost.exe (PID 3104) | 0.64
+[WARN ] Suspicious process → svchost.exe (PID 3196) | 0.65
+[WARN ] Suspicious process → svchost.exe (PID 3204) | 0.80
+[WARN ] Suspicious process → svchost.exe (PID 3224) | 0.67
+[WARN ] Suspicious process → svchost.exe (PID 3232) | 0.54
+[ALERT] Keylogger detected → MsMpEng.exe (PID 3288) | 1.00
+[WARN ] Suspicious process → Code.exe (PID 3352) | 0.76
+[WARN ] Suspicious process → backgroundTaskHost.exe (PID 3376) | 0.76
+[WARN ] Suspicious process → MpDefenderCoreService.exe (PID 3588) | 0.65
+[ALERT] Keylogger detected → msedge.exe (PID 3708) | 0.82
+[WARN ] Suspicious process → svchost.exe (PID 3868) | 0.62
+[WARN ] Suspicious process → svchost.exe (PID 3936) | 0.58
+[ALERT] Keylogger detected → msedge.exe (PID 4124) | 0.83
+[WARN ] Suspicious process → taskhostw.exe (PID 4328) | 0.59
+[ALERT] Keylogger detected → Code.exe (PID 4356) | 0.92
+[WARN ] Suspicious process → msedgewebview2.exe (PID 4452) | 0.60
+[WARN ] Suspicious process → conhost.exe (PID 4540) | 0.66
+[WARN ] Suspicious process → svchost.exe (PID 4548) | 0.60
+[WARN ] Suspicious process → Code.exe (PID 4552) | 0.77
+[WARN ] Suspicious process → msedgewebview2.exe (PID 4632) | 0.62
+[WARN ] Suspicious process → AggregatorHost.exe (PID 4672) | 0.64
+[WARN ] Suspicious process → Code.exe (PID 4752) | 0.60
+[WARN ] Suspicious process → OpenConsole.exe (PID 4828) | 0.69
+[WARN ] Suspicious process → Code.exe (PID 4836) | 0.71
+[WARN ] Suspicious process → svchost.exe (PID 4856) | 0.54
+[WARN ] Suspicious process → chrome.exe (PID 4864) | 0.73
+[WARN ] Suspicious process → sihost.exe (PID 4880) | 0.53
+[WARN ] Suspicious process → RuntimeBroker.exe (PID 5052) | 0.63
+[WARN ] Suspicious process → svchost.exe (PID 5092) | 0.78
+[WARN ] Suspicious process → msedgewebview2.exe (PID 5172) | 0.56
+[WARN ] Suspicious process → svchost.exe (PID 5208) | 0.53
+[ALERT] Keylogger detected → Code.exe (PID 5360) | 0.87
+[ALERT] Keylogger detected → explorer.exe (PID 5384) | 0.97
+[WARN ] Suspicious process → svchost.exe (PID 5412) | 0.52
+[ALERT] Keylogger detected → SearchIndexer.exe (PID 5448) | 0.87
+[WARN ] Suspicious process → ShellHost.exe (PID 5700) | 0.66
+[WARN ] Suspicious process → ApplicationFrameHost.exe (PID 5832) | 0.67
+[WARN ] Suspicious process → CrossDeviceResume.exe (PID 5880) | 0.64
+[WARN ] Suspicious process → svchost.exe (PID 6112) | 0.67
+[WARN ] Suspicious process → svchost.exe (PID 6296) | 0.59
+[WARN ] Suspicious process → svchost.exe (PID 6356) | 0.64
+[WARN ] Suspicious process → RuntimeBroker.exe (PID 6416) | 0.61
+[ALERT] Keylogger detected → SearchHost.exe (PID 6652) | 0.84
+[WARN ] Suspicious process → StartMenuExperienceHost.exe (PID 6668) | 0.67
+[ALERT] Keylogger detected → msedge.exe (PID 6876) | 0.86
+[WARN ] Suspicious process → svchost.exe (PID 6880) | 0.52
+[WARN ] Suspicious process → svchost.exe (PID 7052) | 0.75
+[ALERT] Keylogger detected → chrome.exe (PID 7172) | 0.97
+[ALERT] Keylogger detected → chrome.exe (PID 7252) | 0.81
+[ALERT] Keylogger detected → msedgewebview2.exe (PID 7352) | 0.81
+[WARN ] Suspicious process → msedge.exe (PID 7432) | 0.70
+[ALERT] Keylogger detected → pet.exe (PID 7648) | 0.83
+[ALERT] Keylogger detected → ctfmon.exe (PID 7768) | 0.87
+[ALERT] Keylogger detected → msedgewebview2.exe (PID 7860) | 0.84
+[ALERT] Keylogger detected → msedgewebview2.exe (PID 7868) | 0.86
+[WARN ] Suspicious process → msedgewebview2.exe (PID 7944) | 0.67
+[WARN ] Suspicious process → svchost.exe (PID 8016) | 0.68
+[WARN ] Suspicious process → msedgewebview2.exe (PID 8052) | 0.78
+[WARN ] Suspicious process → LockApp.exe (PID 8096) | 0.55
+[WARN ] Suspicious process → svchost.exe (PID 8240) | 0.74
+[ALERT] Keylogger detected → OpenConsole.exe (PID 8260) | 0.84
+[WARN ] Suspicious process → svchost.exe (PID 8268) | 0.52
+[WARN ] Suspicious process → svchost.exe (PID 8452) | 0.59
+[WARN ] Suspicious process → OpenConsole.exe (PID 8528) | 0.72
+[WARN ] Suspicious process → SecurityHealthSystray.exe (PID 8632) | 0.73
+[WARN ] Suspicious process → chrome.exe (PID 8704) | 0.78
+[ALERT] Keylogger detected → chrome.exe (PID 8820) | 0.85
+[WARN ] Suspicious process → NisSrv.exe (PID 8932) | 0.60
+[WARN ] Suspicious process → powershell.exe (PID 9112) | 0.63
+[WARN ] Suspicious process → powershell.exe (PID 9152) | 0.74
+[ALERT] Keylogger detected → chrome.exe (PID 9268) | 0.87
+[ALERT] Keylogger detected → powershell.exe (PID 9412) | 0.84
+[WARN ] Suspicious process → OpenConsole.exe (PID 9520) | 0.61
+[WARN ] Suspicious process → OneDrive.exe (PID 9768) | 0.78
+[ALERT] Keylogger detected → chrome.exe (PID 10156) | 1.00
+[WARN ] Suspicious process → svchost.exe (PID 10536) | 0.70
+[WARN ] Suspicious process → svchost.exe (PID 10576) | 0.73
+[WARN ] Suspicious process → OneDrive.Sync.Service.exe (PID 10600) | 0.73
+[WARN ] Suspicious process → svchost.exe (PID 10656) | 0.69
+[WARN ] Suspicious process → msedge.exe (PID 10764) | 0.66
+[WARN ] Suspicious process → FileCoAuth.exe (PID 10848) | 0.62
+[ALERT] Keylogger detected → Code.exe (PID 10852) | 0.82
+[ALERT] Keylogger detected → conhost.exe (PID 10892) | 0.86
+[WARN ] Suspicious process → WindowsTerminal.exe (PID 11004) | 0.79
+[WARN ] Suspicious process → WmiPrvSE.exe (PID 11016) | 0.55
+[WARN ] Suspicious process → svchost.exe (PID 11152) | 0.56

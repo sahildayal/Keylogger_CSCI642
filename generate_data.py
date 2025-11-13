@@ -4,7 +4,6 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# Canonical feature set used across the entire project
 FEATURE_COLUMNS = [
     'cpu_percent', 'memory_percent', 'num_handles', 'num_threads', 'nice',
     'read_count', 'write_count', 'read_bytes', 'write_bytes',
@@ -13,18 +12,16 @@ FEATURE_COLUMNS = [
     'memory_rss', 'memory_vms'
 ]
 
-META_COLUMNS = ['pid', 'name', 'label']
-ALL_COLUMNS = ['pid', 'name'] + FEATURE_COLUMNS + ['label']
+META_COLUMNS = ['pid', 'name']
+ALL_COLUMNS = META_COLUMNS + FEATURE_COLUMNS
 
 
-def collect_snapshot(label='unknown'):
-    """Collect a single system snapshot with canonical features."""
+def collect_snapshot():
     rows = []
 
-    # Prime cpu_percent()
-    for proc in psutil.process_iter(['pid']):
+    for p in psutil.process_iter(['pid']):
         try:
-            proc.cpu_percent(None)
+            p.cpu_percent(None)
         except:
             continue
 
@@ -35,11 +32,11 @@ def collect_snapshot(label='unknown'):
         "num_ctx_switches", "num_handles", "num_threads",
         "io_counters", "nice"
     ]):
+
         try:
             info = proc.info
             row = {}
 
-            # Basic metadata
             row['pid'] = info.get('pid', 0)
             row['name'] = info.get('name', '') or ''
 
@@ -49,21 +46,18 @@ def collect_snapshot(label='unknown'):
             except:
                 row['cpu_percent'] = 0.0
 
-            # Memory %
             row['memory_percent'] = info.get('memory_percent', 0.0)
-
-            # Threads / handles / nice
-            row['num_handles'] = info.get('num_handles', 0) or 0
-            row['num_threads'] = info.get('num_threads', 0) or 0
-            row['nice'] = info.get('nice', 0) or 0
+            row['num_handles'] = info.get('num_handles', 0)
+            row['num_threads'] = info.get('num_threads', 0)
+            row['nice'] = info.get('nice', 0)
 
             # I/O counters
             io = info.get('io_counters', None)
             if io:
-                row['read_count'] = getattr(io, 'read_count', 0)
-                row['write_count'] = getattr(io, 'write_count', 0)
-                row['read_bytes'] = getattr(io, 'read_bytes', 0)
-                row['write_bytes'] = getattr(io, 'write_bytes', 0)
+                row['read_count'] = io.read_count
+                row['write_count'] = io.write_count
+                row['read_bytes'] = io.read_bytes
+                row['write_bytes'] = io.write_bytes
             else:
                 row['read_count'] = row['write_count'] = 0
                 row['read_bytes'] = row['write_bytes'] = 0
@@ -71,8 +65,8 @@ def collect_snapshot(label='unknown'):
             # CPU times
             ct = info.get('cpu_times', None)
             if ct:
-                row['cpu_times_user'] = getattr(ct, 'user', 0.0)
-                row['cpu_times_system'] = getattr(ct, 'system', 0.0)
+                row['cpu_times_user'] = ct.user
+                row['cpu_times_system'] = ct.system
             else:
                 row['cpu_times_user'] = 0.0
                 row['cpu_times_system'] = 0.0
@@ -80,22 +74,19 @@ def collect_snapshot(label='unknown'):
             # Context switches
             cs = info.get('num_ctx_switches', None)
             if cs:
-                row['voluntary_ctx_switches'] = getattr(cs, 'voluntary', 0)
-                row['involuntary_ctx_switches'] = getattr(cs, 'involuntary', 0)
+                row['voluntary_ctx_switches'] = cs.voluntary
+                row['involuntary_ctx_switches'] = cs.involuntary
             else:
                 row['voluntary_ctx_switches'] = 0
                 row['involuntary_ctx_switches'] = 0
 
-            # Memory info → MB
+            # Memory info (MB)
             mem = info.get('memory_info', None)
             if mem:
-                row['memory_rss'] = getattr(mem, 'rss', 0) / (1024**2)
-                row['memory_vms'] = getattr(mem, 'vms', 0) / (1024**2)
+                row['memory_rss'] = mem.rss / (1024**2)
+                row['memory_vms'] = mem.vms / (1024**2)
             else:
                 row['memory_rss'] = row['memory_vms'] = 0.0
-
-            # Label assigned externally
-            row['label'] = label
 
             rows.append(row)
 
@@ -107,22 +98,21 @@ def collect_snapshot(label='unknown'):
     return df[ALL_COLUMNS]
 
 
-def collect_dataset(label, duration_seconds=60, interval_seconds=5, output_file="behavior_dataset.csv"):
-    """Continuously collect snapshots and append them to one dataset."""
-    print(f"[INFO] Collecting {label} data for {duration_seconds}s...")
+def collect_dataset(duration_seconds=60, interval_seconds=5,
+                    output_file="raw_behavior_data.csv"):
 
+    print(f"[INFO] Collecting raw process data for {duration_seconds}s...")
     start = time.time()
     all_data = []
 
     while time.time() - start < duration_seconds:
-        snap = collect_snapshot(label)
-        print(f"[INFO] Snapshot at {datetime.now().strftime('%H:%M:%S')} with {len(snap)} processes")
+        snap = collect_snapshot()
         all_data.append(snap)
+        print(f"[INFO] Snapshot at {datetime.now().strftime('%H:%M:%S')} → {len(snap)} processes")
         time.sleep(interval_seconds)
 
     final_df = pd.concat(all_data, ignore_index=True)
 
-    # Append or create dataset
     if os.path.exists(output_file):
         final_df.to_csv(output_file, mode='a', header=False, index=False)
     else:
@@ -132,5 +122,4 @@ def collect_dataset(label, duration_seconds=60, interval_seconds=5, output_file=
 
 
 if __name__ == "__main__":
-    # Example: during benign run
-    collect_dataset(label="benign", duration_seconds=60, interval_seconds=5)
+    collect_dataset(duration_seconds=60, interval_seconds=5)

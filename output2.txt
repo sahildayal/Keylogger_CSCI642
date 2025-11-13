@@ -1,0 +1,20 @@
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI64> python -c "from generate_data import collect_dataset; collect_dataset(label='keylogger', duration_seconds=90, interval_seconds=5, output_file='behavior_dataset.csv')"
+[INFO] Collecting keylogger data for 90s...
+[INFO] Snapshot at 16:35:13 with 176 processes
+[INFO] Snapshot at 16:35:18 with 175 processes
+[INFO] Snapshot at 16:35:24 with 175 processes
+[INFO] Snapshot at 16:35:30 with 176 processes
+[INFO] Snapshot at 16:35:36 with 174 processes
+[INFO] Snapshot at 16:35:42 with 174 processes
+[INFO] Snapshot at 16:35:47 with 174 processes
+[INFO] Snapshot at 16:35:53 with 174 processes
+[INFO] Snapshot at 16:35:59 with 174 processes
+[INFO] Snapshot at 16:36:05 with 176 processes
+[INFO] Snapshot at 16:36:11 with 175 processes
+[INFO] Snapshot at 16:36:17 with 174 processes
+[INFO] Snapshot at 16:36:23 with 174 processes
+[INFO] Snapshot at 16:36:28 with 174 processes
+[INFO] Snapshot at 16:36:34 with 174 processes
+[INFO] Snapshot at 16:36:40 with 174 processes
+[INFO] Saved 2793 rows to behavior_dataset.csv
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642>
