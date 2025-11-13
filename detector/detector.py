@@ -90,26 +90,32 @@ def analyze_file_names(proc_data):
     pass
 
 def standardize_features(df):
-    """Ensure consistent feature order and types across all data"""
-    expected_features = [
-        'cpu_percent', 'memory_percent', 'num_handles', 'num_threads', 'nice',
-        'read_count', 'write_count', 'read_bytes', 'write_bytes', 
-        'cpu_times_user', 'cpu_times_system', 'voluntary_ctx_switches',
-        'involuntary_ctx_switches', 'memory_rss', 'memory_vms'
-    ]
-    
-    # Create missing columns with default values
-    for feature in expected_features:
-        if feature not in df.columns:
-            df[feature] = 0
-    
-    # Select and reorder columns
-    return df[expected_features]
+    """Fix column names to match the trained model"""
+    # Rename columns to match what the model expects
+    column_mapping = {
+        'memory_rss': 'memory_rss_mb',
+        'memory_vms': 'memory_vms_mb',
+        # Add other mappings if needed
+    }
+    df = df.rename(columns=column_mapping)
+   
+    # Get expected features from the model
+    try:
+        loaded_rf = joblib.load("./retrained_detector.pkl")
+        expected_features = loaded_rf.feature_names_in_
+       
+        # Create missing columns with default values
+        for feature in expected_features:
+            if feature not in df.columns:
+                df[feature] = 0
+       
+        return df[expected_features]
+    except:
+        return df
 
 def ml_detector_with_confidence(proc_data):
-    loaded_rf = joblib.load("./random_forest.joblib")
-    expected_features = loaded_rf.feature_names_in_
-    proc_data_clean = proc_data[expected_features].copy()
+    loaded_rf = joblib.load("./retrained_detector.pkl")
+    proc_data_clean = standardize_features(proc_data)
     probabilities = loaded_rf.predict_proba(proc_data_clean)
     
     detect = False

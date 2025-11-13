@@ -182,4 +182,4 @@ def continuous_data_collection(duration_minutes=60):
 # get_process_memory_usage()
 # generate_boxplots()
 # extract_keylogger_data()
-continuous_data_collection(duration_minutes=5)
+continuous_data_collection(duration_minutes=30)
