@@ -1,0 +1,18 @@
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python .\detector.py
+
+[DETECTION RESULTS]
+
+[WARN ] Suspicious → python.exe (PID 9908) | 0.61
+[INFO] No keylogger confidently detected.
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python .\detector.py
+
+[DETECTION RESULTS]
+
+[WARN ] Suspicious → python.exe (PID 9908) | 0.62
+[INFO] No keylogger confidently detected.
+PS C:\Users\sdvir\Desktop\Keylogger\Keylogger_CSCI642> python .\detector.py
+
+[DETECTION RESULTS]
+
+[WARN ] Suspicious → python.exe (PID 9908) | 0.63
+[INFO] No keylogger confidently detected.

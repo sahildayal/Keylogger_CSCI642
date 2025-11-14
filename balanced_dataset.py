@@ -5,7 +5,7 @@ OUTPUT_FILE = "balanced_dataset.csv"
 
 # Set ratio of benign:keylogger
 # Example: if keylogger=200 rows, benign=600 rows (3:1 ratio)
-BENIGN_RATIO = 3     # change this if you want 1:1 or 2:1
+BENIGN_RATIO = 15     # change this if you want 1:1 or 2:1
 
 print("[INFO] Loading combined dataset...")
 df = pd.read_csv(INPUT_FILE)
