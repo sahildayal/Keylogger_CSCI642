@@ -13,7 +13,7 @@ FEATURE_COLUMNS = [
 ]
 
 
-def train_detector(csv_path="labeled_behavior_data.csv",
+def train_detector(csv_path="combined_dataset.csv",
                    model_path="retrained_detector.pkl"):
 
     df = pd.read_csv(csv_path)
