@@ -122,4 +122,4 @@ def collect_dataset(duration_seconds=60, interval_seconds=5,
 
 
 if __name__ == "__main__":
-    collect_dataset(duration_seconds=60, interval_seconds=5)
+    collect_dataset(duration_seconds=300, interval_seconds=5)
