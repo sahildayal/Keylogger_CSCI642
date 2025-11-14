@@ -4,7 +4,7 @@ import seaborn as sns
 import joblib
 import os
 
-CSV_PATH = "labeled_behavior_data.csv"
+CSV_PATH = "combined_dataset.csv"
 MODEL_PATH = "retrained_detector.pkl"
 
 # =========================================================
