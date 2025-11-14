@@ -40,18 +40,30 @@ def plot_label_distribution(df):
 # 2. Boxplots for ALL numeric features
 # =========================================================
 def plot_feature_boxplots(df):
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns
+    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
 
     for col in numeric_cols:
-        if col in ["pid"]:  # skip pid
+        if col in ["pid"]:
             continue
 
-        plt.figure(figsize=(7, 4))
-        sns.boxplot(x=df["label"], y=df[col])
-        plt.title(f"Boxplot: {col} (Benign vs Keylogger)")
+        plt.figure(figsize=(8, 5))
+        sns.boxplot(
+            data=df,
+            x="label",
+            y=col,
+            palette={"benign": "#4CAF50", "keylogger": "#F44336"},
+            width=0.5,
+            linewidth=1.2,
+            showfliers=True  # shows outliers, better for research
+        )
+
+        plt.title(f"{col} — Box & Whisker Comparison")
+        plt.xlabel("Class")
+        plt.ylabel(col)
         plt.tight_layout()
         plt.savefig(f"graphs/{col}_boxplot.png")
         plt.close()
+
 
 
 # =========================================================
