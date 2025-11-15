@@ -4,7 +4,7 @@ These are the parts to this project:
 1. Creating a keylogger that runs on a Windows 10 system
 2. Creating a detection system for the keylogger developed (and similar keyloggers already developed)
 
-**Note** Multiple attempts were explored to determine the best way to create the keylogger and detection system. The paper is based off of work done in the paper_files directory
+**Note**: Multiple attempts were explored to determine the best way to create the keylogger and detection system. The paper is based off of work done in the paper_files directory
 
 ## Install and Requirements
 It is recommended to use a virtual environment in order to keep track of all packages
