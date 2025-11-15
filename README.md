@@ -1,6 +1,6 @@
 # Group3_CSCI642_Project: Using Behavioral Analysis to Detect Keyloggers
 
-There are parts to this project:
+These are the parts to this project:
 1. Creating a keylogger that runs on a Windows 10 system
 2. Creating a detection system for the keylogger developed (and similar keyloggers already developed)
 
