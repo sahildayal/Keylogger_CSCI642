@@ -47,8 +47,46 @@ This contains only the important elements to highlight for phase 3 of the projec
 ├── requirements.txt
 ```
 ## Paper Files
+# Paper Files — Keylogger Detection Pipeline
 
+This folder contains the scripts, dataset, and trained model used for the behavioral keylogger detection pipeline described in the paper. These files allow anyone to reproduce the pipeline, retrain the model, or run the detector on a Windows 10 system.
 
+## Contents
+
+- **balanced_dataset.csv** – Preprocessed and balanced dataset used for training.  
+- **stealth_keylogger.py** – Stealth keylogger used to generate malicious behavior.  
+- **training_model.py** – Trains the Random Forest model and saves `retrained_detector.pkl`.  
+- **detector.py** – Runs live behavioral detection using system process metrics.  
+- **retrained_detector.pkl** – Trained classifier used during inference
+
+## Running the Keylogger
+```bash
+python stealth_keylogger.py
+```
+- Logs keystrokes until **ESC** is pressed.  
+- Produces a CSV log in the same directory.
+
+## Training the Detector
+```bash
+python training_model.py
+```
+This loads `balanced_dataset.csv`, trains the model (≈0.86 accuracy), and outputs `retrained_detector.pkl`.
+
+## Running the Detector
+```bash
+python detector.py
+```
+The script:
+- Collects a live snapshot of running processes  
+- Aligns features with the trained model  
+- Outputs: **Detected Keylogger**, **Suspected Keylogger**, or **No Keylogger Detected**
+
+## Pipeline Overview
+1. (Optional) Run `stealth_keylogger.py` to generate keylogger activity  
+2. Use `balanced_dataset.csv` (or create your own)  
+3. Train the classifier with `training_model.py`  
+4. Run real-time detection with `detector.py`
+---
 
 **Note**: The following describes how one would implement another attempt (whose data was not utilized in the research paper), which also utilizes some code from the paper_files directory, however, not all were integrated completely (this will be fully merged for the final deliverable in phase 4)
 ## Keylogger Development and Deployment
