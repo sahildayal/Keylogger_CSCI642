@@ -40,6 +40,7 @@ This contains only the important elements to highlight for phase 3 of the projec
 │   ├── graphs
 │   ├── paper_files
 │   │   ├── balanced_dataset.csv
+│   │   ├── random_forest.pkl
 │   │   ├── stealth_keylogger.py
 │   │   └── training_model.py
 ├── securecodingenv
@@ -48,6 +49,8 @@ This contains only the important elements to highlight for phase 3 of the projec
 ## Paper Files
 
 
+
+**Note**: The following describes how one would implement another attempt (whose data was not utilized in the research paper), which also utilizes some code from the paper_files directory, however, not all were integrated completely (this will be fully merged for the final deliverable in phase 4)
 ## Keylogger Development and Deployment
 There are 2 ways to run the keylogger:
 1. In the phase3 directory, run the command ```python .\keylogger.py```
