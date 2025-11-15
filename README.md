@@ -45,6 +45,8 @@ This contains only the important elements to highlight for phase 3 of the projec
 ├── securecodingenv
 ├── requirements.txt
 ```
+## Paper Files
+
 
 ## Keylogger Development and Deployment
 There are 2 ways to run the keylogger:
