@@ -54,15 +54,19 @@ def plot_feature_boxplots(df):
             palette={"benign": "#4CAF50", "keylogger": "#F44336"},
             width=0.5,
             linewidth=1.2,
-            showfliers=True  # shows outliers, better for research
+            showfliers=True
         )
 
-        plt.title(f"{col} — Box & Whisker Comparison")
+        # APPLY LOG SCALE (IMPORTANT)
+        plt.yscale("log")
+
+        plt.title(f"{col} — Box & Whisker (Log Scale)")
         plt.xlabel("Class")
-        plt.ylabel(col)
+        plt.ylabel(f"{col} (log scale)")
         plt.tight_layout()
-        plt.savefig(f"graphs/{col}_boxplot.png")
+        plt.savefig(f"graphs/{col}_boxplot_log.png", dpi=300)
         plt.close()
+
 
 
 
@@ -128,6 +132,45 @@ def plot_feature_importance():
     plt.savefig("graphs/feature_importance.png")
     plt.close()
 
+# =========================================================
+# 6. Combined Multi-Feature Pairplot (Best 3 Features)
+# =========================================================
+def plot_combined_pairplot(df):
+    features = ["read_bytes", "write_bytes", "num_handles"]
+
+    # Check all features exist
+    for f in features:
+        if f not in df.columns:
+            print(f"[WARN] Skipping pairplot. Missing feature: {f}")
+            return
+
+    # Map your label colors
+    palette = {
+        "benign": "#4CAF50",      # green
+        "keylogger": "#F44336"    # red
+    }
+
+    # Create folder
+    os.makedirs("graphs", exist_ok=True)
+
+    print("[INFO] Creating combined pairplot for read_bytes, write_bytes, num_handles...")
+
+    sns.pairplot(
+        df,
+        vars=features,
+        hue="label",
+        palette=palette,
+        diag_kind="kde",
+        corner=True
+    )
+
+    plt.suptitle("Combined Feature Pairplot: read_bytes, write_bytes, num_handles", y=1.02)
+    plt.tight_layout()
+    plt.savefig("graphs/combined_pairplot.png", dpi=300)
+    plt.close()
+
+    print("[INFO] Saved: graphs/combined_pairplot.png")
+
 
 # =========================================================
 # MAIN
@@ -142,5 +185,7 @@ if __name__ == "__main__":
     plot_feature_histograms(df)
     plot_correlation_heatmap(df)
     plot_feature_importance()
+    plot_combined_pairplot(df)
+
 
     print("[INFO] Done! All graphs saved in 'graphs/' folder.")
