@@ -1,0 +1,22 @@
+This file will describe the contributions to the code of this project by each team member.
+
+During phase 3 of this project, each team member worked on the pipeline in distinct branches.
+The pipelines were then compared, validated, and tested together for consistency and performance.
+
+Sahil Dayal:
+    - Handled implementation of the keylogger and stealth keylogger
+    - Data collection
+    - Development and training of Random Forest Model and detection process
+
+Jared Randall:
+    - Data collection
+        - Researched and utilized 2 similar keyloggers to the one being developed to add into data collection and testing
+    - Development and training of Random Forest Model and detection and termination process
+    - Code integration of all team member's work/pipelines
+    - Documentation and project structure
+
+Ming Creekmore:
+    - Developed program to generate data
+    - Data collection
+        - Researched and utilized a similar keylogger to the one being developed to add ino data collection and testing
+    - Development of Random Forest Model

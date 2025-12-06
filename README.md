@@ -1,14 +1,11 @@
-# Group3_CSCI642_Project: Using Behavioral Analysis to Detect Keyloggers
+# Group3_CSCI642_Project: Improving User Space Keylogger Detection Through Behavioral Analysis
 
 These are the parts to this project:
-1. Creating a keylogger that runs on a Windows 10 system
+1. Creating a Python user space keylogger that runs on a Windows 10 system
 2. Creating a detection system for the keylogger developed (and similar keyloggers already developed)
 
-**Note**: Multiple attempts were explored to determine the best way to create the keylogger and detection system. The paper is based off of work done in the paper_files directory
-
 ## Install and Requirements
-It is recommended to use a virtual environment in order to keep track of all packages
-This can be done by doing the following:
+It is recommented to not only use a Virtual Machine (VM), running Windows 10, but also to use a virtual environment in order to keep track of all packages. This can be done by doing the following:
 
 ```
 python -m venv <name of virtual environment>
@@ -19,89 +16,73 @@ Then install the required packages using `pip` and `requirements.txt`:
 ```pip install -r requirements.txt```
 
 ## System Architecture
-This contains only the important elements to highlight for phase 3 of the project (and will be updated for final submission)
+This displays the following important directories and files for this project. Some files have been excluded for abstraction and clarity purposes (ex. there are many data sample files that are not included).
 ```
+Keylogger_CSCI642/
 ├── data
-│   ├──merged_data
+│   ├── dev1_collected_data
+│   ├── merged_data
+│   │   ├── balanced_dataset.csv        # preprocessed dataset used for training
 │   │   └── combined_dataset.csv
-├── phase 2
-├── phase 3
+│   ├── dev2_collected_data
+│   └── dev3_collected_data
+├── src
 │   ├── detection
-│   │   ├── detector.py
-│   │   ├── model.py
+│   │   ├── __init__.py
+│   │   ├── detector.py                 # behavioral detection of live system metrics
+│   │   ├── model.py                    # trains Random Forest model
 │   │   ├── random_forest.joblib
-│   │   └── random_forest.pkl
+│   │   ├── random_forest.pkl
+│   │   └── retrained_detector.pkl      # trained classifier used for report and analysis
 │   ├── exe_files
+│   │   ├── build
+│   │   │   ├── generate_data
+│   │   │   ├── keylogger
+│   │   │   └── stealth_keylogger
+│   │   ├── dist
+│   │   │   ├── generate_data.exe
+│   │   │   ├── keylogger.exe
+│   │   │   └── stealth_keylogger.exe
+│   │   ├── generate_data.spec
+│   │   ├── keylogger.spec
+│   │   └── stealth_keylogger.spec
+│   ├── graphs
 │   ├── keylogger
 │   │   ├── keylogger.py
 │   │   └── stealth_keylogger.py
 │   ├── utils
 │   │   └── generate_data.py
-│   ├── graphs
-│   ├── paper_files
-│   │   ├── balanced_dataset.csv
-│   │   ├── random_forest.pkl
-│   │   ├── stealth_keylogger.py
-│   │   └── training_model.py
 ├── securecodingenv
+├── .gitignore
+├── CONTRIBUTIONS
+├── README.md
+├── README.txt
 ├── requirements.txt
 ```
-## Paper Files
-# Paper Files — Keylogger Detection Pipeline
-
-This folder contains the scripts, dataset, and trained model used for the behavioral keylogger detection pipeline described in the paper. These files allow anyone to reproduce the pipeline, retrain the model, or run the detector on a Windows 10 system.
-
-## Contents
-
-- **balanced_dataset.csv** – Preprocessed and balanced dataset used for training.  
-- **stealth_keylogger.py** – Stealth keylogger used to generate malicious behavior.  
-- **training_model.py** – Trains the Random Forest model and saves `retrained_detector.pkl`.  
-- **detector.py** – Runs live behavioral detection using system process metrics.  
-- **retrained_detector.pkl** – Trained classifier used during inference
-
-## Running the Keylogger
-```bash
-python stealth_keylogger.py
-```
-- Logs keystrokes until **ESC** is pressed.  
-- Produces a CSV log in the same directory.
-
-## Training the Detector
-```bash
-python training_model.py
-```
-This loads `balanced_dataset.csv`, trains the model (≈0.86 accuracy), and outputs `retrained_detector.pkl`.
-
-## Running the Detector
-```bash
-python detector.py
-```
-The script:
-- Collects a live snapshot of running processes  
-- Aligns features with the trained model  
-- Outputs: **Detected Keylogger**, **Suspected Keylogger**, or **No Keylogger Detected**
-
 ## Pipeline Overview
-1. (Optional) Run `stealth_keylogger.py` to generate keylogger activity  
-2. Use `balanced_dataset.csv` (or create your own)  
-3. Train the classifier with `training_model.py`  
-4. Run real-time detection with `detector.py`
----
+The following describes how the project was developed and may be useful for recreating the results
+- Run either the ```keylogger.py``` or ```stealth_keylogger.py```
+- Generate keylogger data by utilizing ```generate_data.py```
+- Conglomerate and clean all generated data (```clean_sort_merge.py``` may be of some use)
+- Utilize that generated dataset to train the model using ```model.py```
+- Run real-time detection wtih ```detector.py```
 
-**Note**: The following describes how one would implement another attempt (whose data was not utilized in the research paper), which also utilizes some code from the paper_files directory, however, not all were integrated completely (this will be fully merged for the final deliverable in phase 4)
 ## Keylogger Development and Deployment
 There are 2 ways to run the keylogger:
-1. In the phase3 directory, run the command ```python .\keylogger.py```
-    - This will log all keystrokes to a file called `keystroke_log.csv` in the directory in which the file is run (i.e. phase3)
+1. In the keylogger directory, run the command ```python .\keylogger.py```
+    - This will log all keystrokes to a file called `keystroke_log.csv` in the directory in which the file is run (i.e. keylogger)
     - To stop the keylogger, simply press the ESC key
 
-2. A `.exe` file has been provided in the phase3 directory. This was generated with the command ```pyinstaller --onefile .\keylogger.py```. This would be more similar to a real world attack, as not every computer would have Python installed (which is needed for the previous way to run the keylogger) and the `keylogger.exe` can be run in the command prompt/powershell of Window 10 computers
+2. A `.exe` file has been provided in the exe_files directory. This was generated with the command ```pyinstaller --onefile .\keylogger.py```. This would be more similar to a real world attack, as not every computer would have Python installed (which is needed for the previous way to run the keylogger) and the `keylogger.exe` can be run in the command prompt/powershell of Window 10 computers
+
+### Stealth Keylogger
+Similar steps can be taken to run the stealth keylogger by replacing all instances of  ```keylogger``` in the above steps with ```stealth_keylogger```
 
 ## Generating Training Data
-The program `generate_data.py` (located in phase3 directory) collects information on all running processes on the device. This data is used to train the keylogger detector model. It labels processes as either 'benign' or 'keylogger' (this is based on user-inputted process id values (pid))
+The program `generate_data.py` (located in utils directory) collects information on all running processes on the device. This data is used to train the keylogger detector model. It labels processes as either 'benign' or 'keylogger' (this is based on user-inputted process id values (pid))
 
 Information Collected:
-- cpu
+- CPU usage
 - memory
 - threads
 - I/O operations
@@ -127,12 +108,27 @@ In order to run the program, follow the steps below:
 - if no pid(s) are given, then it will label all processes as 'benign'
 
 ## Detector Development and Deployment
-A Random Forest Model was developed and trained off of data from multiple Virtual Machines running Windows 10. This takes a snapshot of the current machine and runs the data against the trained model and outputs (with confidence) if there is a suspected keylogger or detected keylogger.
+### Training the AI Model
+A Random Forest model was developed and trained off of data from multiple Virtual Machines running Windows 10. This takes a snapshot of the current machine and runs the data against the trained model and outputs (with confidence) if there is a suspected keylogger or detected keylogger.
 - Suspected Keylogger: Confidence of 40% - 70%
 - Detected Keylogger: Confidence of >70%
 
+To train the Random Forest model, run the following (from the detection directory):
+```python .\model.py```
+This loads the data and outputs random_forest.joblib and random_forest.pkl. When testing, the data loaded into the program was ```balanced_dataset.csv```, which trained a model to ≈0.86 accuracy and outputted the ```retrained_detector.pkl``` file.
+
+### Running the Detector
+Utilizing the Random Forest model trained, ```detector.py``` collects a live snapshot of all running processes and tests agains the model to classify process activity as:
+- Detected Keylogger
+- Suspected Keylogger
+- Benign Activity
+The user will then be able to go through the list of detected and suspected keylogger processes and decide whether or not to terminate them. 
+
 The following shows how to run the detector (from the detection directory):
 ```python .\detector.py```
+
+## Files in Utils
+The files located in the utils directory (besides ```generate_data.py```) were used as helper scripts at certain points in the project and may or may not be useful when trying to get similar results. They will need to be edited to fit your specific needs. 
 
 ## Other Keyloggers Used for Data Training and Testing
 These keyloggers were picked to help train the model and test if they could be detected as they are similar to the keylogger that was developed in this project. It's important that this tool does not only detect our keylogger, but other ones as well, as this tool's intended use is to prevent user space keyloggers on Windows 10 (not just the one developed)
