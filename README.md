@@ -26,6 +26,7 @@ Keylogger_CSCI642/
 │   │   └── combined_dataset.csv
 │   ├── dev2_collected_data
 │   └── dev3_collected_data
+├── securecodingenv
 ├── src
 │   ├── detection
 │   │   ├── __init__.py
@@ -52,7 +53,6 @@ Keylogger_CSCI642/
 │   │   └── stealth_keylogger.py
 │   ├── utils
 │   │   └── generate_data.py
-├── securecodingenv
 ├── .gitignore
 ├── CONTRIBUTIONS
 ├── README.md
